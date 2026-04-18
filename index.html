@@ -1,0 +1,513 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Codveda Data Analytics – Full Task Report</title>
+<style>
+  :root {
+    --green: #27ae60; --dark: #1a1a2e; --teal: #16a085;
+    --orange: #e67e22; --red: #c0392b; --gray: #f4f6f8;
+    --text: #2c3e50; --border: #dce3ea;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: 'Segoe UI', Arial, sans-serif; background: #f0f2f5; color: var(--text); }
+
+  /* ── HEADER ── */
+  .header {
+    background: linear-gradient(135deg, var(--dark) 0%, #16213e 60%, #0f3460 100%);
+    color: white; padding: 48px 40px 36px; text-align: center;
+  }
+  .header .badge { display: inline-block; background: var(--green); color: white;
+    font-size: 11px; font-weight: 700; letter-spacing: 2px; text-transform: uppercase;
+    padding: 4px 14px; border-radius: 20px; margin-bottom: 16px; }
+  .header h1 { font-size: 2.4rem; font-weight: 800; margin-bottom: 8px; }
+  .header p { font-size: 1rem; opacity: 0.75; max-width: 600px; margin: 0 auto; }
+
+  /* ── PROGRESS BAR ── */
+  .progress-bar { background: var(--dark); padding: 16px 40px; display: flex;
+    gap: 0; overflow-x: auto; }
+  .prog-item { flex: 1; text-align: center; padding: 10px 8px; border-radius: 6px;
+    font-size: 11px; font-weight: 600; color: rgba(255,255,255,0.5);
+    letter-spacing: 0.5px; text-transform: uppercase; min-width: 100px; }
+  .prog-item.done { background: rgba(39,174,96,0.2); color: #2ecc71; }
+  .prog-item span { display: block; font-size: 20px; margin-bottom: 4px; }
+
+  /* ── LEVEL SECTIONS ── */
+  .container { max-width: 1100px; margin: 0 auto; padding: 40px 24px; }
+  .level-header {
+    display: flex; align-items: center; gap: 16px;
+    margin: 48px 0 24px; padding-bottom: 12px;
+    border-bottom: 3px solid var(--border);
+  }
+  .level-badge { padding: 6px 18px; border-radius: 20px; font-size: 12px;
+    font-weight: 700; letter-spacing: 1px; text-transform: uppercase; }
+  .l1 .level-badge { background: #d5f5e3; color: #1e8449; }
+  .l2 .level-badge { background: #d6eaf8; color: #1a5276; }
+  .l3 .level-badge { background: #fdebd0; color: #784212; }
+  .level-header h2 { font-size: 1.6rem; font-weight: 800; }
+
+  /* ── TASK CARDS ── */
+  .task-card {
+    background: white; border-radius: 14px; margin-bottom: 32px;
+    box-shadow: 0 2px 12px rgba(0,0,0,0.07); overflow: hidden;
+  }
+  .task-header {
+    display: flex; align-items: center; gap: 16px;
+    padding: 20px 28px; border-bottom: 1px solid var(--border);
+  }
+  .task-num { width: 40px; height: 40px; border-radius: 50%; display: flex;
+    align-items: center; justify-content: center; font-weight: 800;
+    font-size: 16px; flex-shrink: 0; }
+  .l1-num { background: #d5f5e3; color: #1e8449; }
+  .l2-num { background: #d6eaf8; color: #1a5276; }
+  .l3-num { background: #fdebd0; color: #784212; }
+  .task-header h3 { font-size: 1.1rem; font-weight: 700; }
+  .task-header p { font-size: 0.85rem; color: #7f8c8d; margin-top: 2px; }
+  .task-body { padding: 24px 28px; }
+
+  /* ── METRICS ── */
+  .metrics { display: flex; flex-wrap: wrap; gap: 12px; margin-bottom: 20px; }
+  .metric { background: var(--gray); border-radius: 10px; padding: 12px 18px;
+    flex: 1; min-width: 120px; }
+  .metric .label { font-size: 11px; color: #95a5a6; font-weight: 600;
+    text-transform: uppercase; letter-spacing: 0.5px; }
+  .metric .value { font-size: 1.4rem; font-weight: 800; margin-top: 2px; }
+  .metric.green .value { color: var(--green); }
+  .metric.blue .value  { color: var(--teal); }
+  .metric.orange .value { color: var(--orange); }
+  .metric.red .value    { color: var(--red); }
+
+  /* ── STEPS ── */
+  .steps { display: flex; flex-direction: column; gap: 10px; margin-bottom: 20px; }
+  .step { display: flex; gap: 12px; align-items: flex-start; }
+  .step-dot { width: 22px; height: 22px; border-radius: 50%; flex-shrink: 0;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 11px; font-weight: 700; color: white; margin-top: 1px; }
+  .step-dot.g { background: var(--green); }
+  .step-dot.b { background: var(--teal); }
+  .step-dot.o { background: var(--orange); }
+  .step p { font-size: 0.88rem; line-height: 1.5; }
+  .step strong { font-weight: 600; }
+
+  /* ── PLOTS ── */
+  .plot-grid { display: grid; gap: 16px; margin-top: 20px; }
+  .plot-grid.cols2 { grid-template-columns: repeat(auto-fit, minmax(380px, 1fr)); }
+  .plot-grid.cols1 { grid-template-columns: 1fr; }
+  .plot-wrap { background: #fafbfc; border: 1px solid var(--border);
+    border-radius: 10px; overflow: hidden; }
+  .plot-wrap img { width: 100%; display: block; }
+  .plot-caption { font-size: 12px; color: #7f8c8d; padding: 8px 12px;
+    border-top: 1px solid var(--border); text-align: center; }
+
+  /* ── CODE BLOCK ── */
+  .code-block { background: #1e1e2e; border-radius: 10px; padding: 16px 20px;
+    overflow-x: auto; margin-top: 16px; }
+  .code-block pre { color: #cdd6f4; font-family: 'Consolas','Courier New',monospace;
+    font-size: 12.5px; line-height: 1.7; }
+  .kw { color: #cba6f7; } .fn { color: #89b4fa; }
+  .str { color: #a6e3a1; } .cm { color: #6c7086; font-style: italic; }
+  .num { color: #fab387; }
+
+  /* ── INSIGHTS ── */
+  .insights { background: linear-gradient(135deg, #f8fbff 0%, #eef6ff 100%);
+    border-left: 4px solid var(--teal); border-radius: 0 10px 10px 0;
+    padding: 16px 20px; margin-top: 16px; }
+  .insights h4 { font-size: 13px; font-weight: 700; color: var(--teal);
+    text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 10px; }
+  .insights ul { padding-left: 18px; }
+  .insights li { font-size: 0.88rem; line-height: 1.6; color: var(--text); margin-bottom: 4px; }
+
+  /* ── TABLE ── */
+  .results-table { width: 100%; border-collapse: collapse; margin-top: 16px; font-size: 13px; }
+  .results-table th { background: var(--dark); color: white; padding: 10px 14px;
+    text-align: left; font-size: 12px; letter-spacing: 0.5px; }
+  .results-table td { padding: 9px 14px; border-bottom: 1px solid var(--border); }
+  .results-table tr:nth-child(even) td { background: var(--gray); }
+  .results-table .best { color: var(--green); font-weight: 700; }
+  .tag { display: inline-block; padding: 2px 10px; border-radius: 12px;
+    font-size: 11px; font-weight: 600; }
+  .tag.green { background: #d5f5e3; color: #1e8449; }
+  .tag.blue  { background: #d6eaf8; color: #1a5276; }
+  .tag.gray  { background: #ecf0f1; color: #7f8c8d; }
+
+  /* ── FOOTER ── */
+  .footer { background: var(--dark); color: rgba(255,255,255,0.6);
+    text-align: center; padding: 32px 24px; margin-top: 60px; font-size: 13px; }
+  .footer strong { color: white; }
+</style>
+</head>
+<body>
+
+<!-- HEADER -->
+<div class="header">
+  <div class="badge">Codveda Technology – Data Analytics Internship</div>
+  <h1>📊 Data Analytics – Complete Task Report</h1>
+  <p>All 3 Levels × All Tasks Completed &nbsp;|&nbsp; Python · pandas · scikit-learn · matplotlib · seaborn</p>
+</div>
+
+<!-- PROGRESS -->
+<div class="progress-bar">
+  <div class="prog-item done"><span>✅</span>L1 · T1<br>Cleaning</div>
+  <div class="prog-item done"><span>✅</span>L1 · T2<br>EDA</div>
+  <div class="prog-item done"><span>✅</span>L1 · T3<br>Visualize</div>
+  <div class="prog-item done"><span>✅</span>L2 · T1<br>Regression</div>
+  <div class="prog-item done"><span>✅</span>L2 · T2<br>Time Series</div>
+  <div class="prog-item done"><span>✅</span>L2 · T3<br>K-Means</div>
+  <div class="prog-item done"><span>✅</span>L3 · T1<br>Classification</div>
+  <div class="prog-item done"><span>✅</span>L3 · T3<br>NLP / Sentiment</div>
+</div>
+
+<div class="container">
+
+<!-- ══════════════════════════════════════════════════════════ LEVEL 1 -->
+<div class="level-header l1">
+  <span class="level-badge">Level 1</span>
+  <h2>Basic Data Analytics</h2>
+</div>
+
+<!-- L1 T1 -->
+<div class="task-card">
+  <div class="task-header">
+    <div class="task-num l1-num">1</div>
+    <div>
+      <h3>Task 1 — Data Cleaning &amp; Preprocessing</h3>
+      <p>Dataset: Iris (150 rows × 5 cols) &nbsp;·&nbsp; Tools: Python, pandas</p>
+    </div>
+  </div>
+  <div class="task-body">
+    <div class="metrics">
+      <div class="metric green"><div class="label">Original Rows</div><div class="value">150</div></div>
+      <div class="metric blue"><div class="label">Nulls Injected (10%)</div><div class="value">60</div></div>
+      <div class="metric orange"><div class="label">After Imputation</div><div class="value">0 nulls</div></div>
+      <div class="metric green"><div class="label">Duplicates Removed</div><div class="value">1</div></div>
+    </div>
+    <div class="steps">
+      <div class="step"><div class="step-dot g">1</div><p><strong>Loaded</strong> the Iris CSV with pandas; confirmed 150 rows, 5 columns, no original missing values.</p></div>
+      <div class="step"><div class="step-dot g">2</div><p><strong>Injected 10% random nulls</strong> across 4 numeric columns to simulate real-world missing data, then <strong>imputed with column medians</strong> (robust to outliers).</p></div>
+      <div class="step"><div class="step-dot g">3</div><p><strong>Removed 1 duplicate row</strong> using <code>drop_duplicates()</code>.</p></div>
+      <div class="step"><div class="step-dot g">4</div><p><strong>Standardised species labels</strong>: stripped whitespace, lowercased, then title-cased → <em>Setosa, Versicolor, Virginica</em>.</p></div>
+    </div>
+    <div class="code-block"><pre><span class="cm"># Median imputation for numeric columns</span>
+<span class="kw">for</span> col <span class="kw">in</span> numeric_cols:
+    df[col].<span class="fn">fillna</span>(df[col].<span class="fn">median</span>(), inplace=<span class="kw">True</span>)
+
+<span class="cm"># Remove duplicates</span>
+df.<span class="fn">drop_duplicates</span>(inplace=<span class="kw">True</span>)
+
+<span class="cm"># Standardise categorical column</span>
+df[<span class="str">'species'</span>] = df[<span class="str">'species'</span>].<span class="fn">str.strip</span>().<span class="fn">str.lower</span>().<span class="fn">str.capitalize</span>()</pre></div>
+    <div class="plot-grid cols1">
+      <div class="plot-wrap">
+        <img src="L1T1_cleaning.png" alt="Missing value heatmap">
+        <div class="plot-caption">Fig 1.1 — Missing Value Heatmap: Before (red) vs After (green) cleaning</div>
+      </div>
+    </div>
+    <div class="insights">
+      <h4>🔍 Key Insights</h4>
+      <ul>
+        <li>Median imputation was chosen over mean because it is unaffected by extreme values — important for small datasets.</li>
+        <li>Standardising string casing prevents silent duplicates where "setosa" ≠ "Setosa" in groupby operations.</li>
+        <li>Final clean dataset: <strong>149 rows × 5 columns</strong>, ready for downstream analysis.</li>
+      </ul>
+    </div>
+  </div>
+</div>
+
+<!-- L1 T2 -->
+<div class="task-card">
+  <div class="task-header">
+    <div class="task-num l1-num">2</div>
+    <div>
+      <h3>Task 2 — Exploratory Data Analysis (EDA)</h3>
+      <p>Dataset: Iris &nbsp;·&nbsp; Tools: pandas, matplotlib, seaborn</p>
+    </div>
+  </div>
+  <div class="task-body">
+    <div class="metrics">
+      <div class="metric green"><div class="label">Sepal Length Mean</div><div class="value">5.84</div></div>
+      <div class="metric blue"><div class="label">Petal Length Std</div><div class="value">1.76</div></div>
+      <div class="metric orange"><div class="label">Petal Len↔Width ρ</div><div class="value">0.963</div></div>
+      <div class="metric green"><div class="label">Sepal Len↔Width ρ</div><div class="value">−0.109</div></div>
+    </div>
+    <div class="plot-grid cols2">
+      <div class="plot-wrap">
+        <img src="L1T2_histograms.png" alt="Histograms">
+        <div class="plot-caption">Fig 1.2a — Feature Distributions with Mean (dashed) and Median (dotted)</div>
+      </div>
+      <div class="plot-wrap">
+        <img src="L1T2_boxplots.png" alt="Boxplots">
+        <div class="plot-caption">Fig 1.2b — Boxplots by Species — clear separation in petal features</div>
+      </div>
+      <div class="plot-wrap">
+        <img src="L1T2_scatter.png" alt="Scatter plots">
+        <div class="plot-caption">Fig 1.2c — Scatter Plots showing species clusters</div>
+      </div>
+      <div class="plot-wrap">
+        <img src="L1T2_correlation.png" alt="Correlation heatmap">
+        <div class="plot-caption">Fig 1.2d — Correlation Heatmap (lower triangle)</div>
+      </div>
+    </div>
+    <div class="insights">
+      <h4>🔍 Key Insights</h4>
+      <ul>
+        <li><strong>Petal Length &amp; Width</strong> have the strongest correlation (ρ = 0.963) — highly collinear.</li>
+        <li><strong>Setosa</strong> is linearly separable from Versicolor and Virginica on all petal features.</li>
+        <li>Sepal Width shows the least discriminative power (smallest between-species variance).</li>
+        <li>Petal length distribution is bimodal — a clear sign of two underlying populations.</li>
+      </ul>
+    </div>
+  </div>
+</div>
+
+<!-- L1 T3 -->
+<div class="task-card">
+  <div class="task-header">
+    <div class="task-num l1-num">3</div>
+    <div>
+      <h3>Task 3 — Basic Data Visualization</h3>
+      <p>Dataset: Iris &nbsp;·&nbsp; Tools: matplotlib, seaborn</p>
+    </div>
+  </div>
+  <div class="task-body">
+    <div class="plot-grid cols1">
+      <div class="plot-wrap"><img src="L1T3_barplot.png" alt="Bar Plot">
+        <div class="plot-caption">Fig 1.3a — Bar Plot: Mean Feature Values per Species (with value labels)</div></div>
+      <div class="plot-wrap"><img src="L1T3_linechart.png" alt="Line Chart">
+        <div class="plot-caption">Fig 1.3b — Line Chart: Sorted Sepal Length Distribution Trend by Species</div></div>
+      <div class="plot-wrap"><img src="L1T3_scatter.png" alt="Scatter Plot">
+        <div class="plot-caption">Fig 1.3c — Scatter Plot: Petal Length vs Petal Width with Linear Trend Line</div></div>
+    </div>
+    <div class="insights">
+      <h4>🔍 Key Insights</h4>
+      <ul>
+        <li>Virginica has the largest mean values across all features, while Setosa consistently has the smallest petals.</li>
+        <li>The scatter plot with a trend line confirms a near-perfect linear relationship (ρ = 0.963) between petal dimensions.</li>
+        <li>All plots include custom titles, axis labels, and legends as required by the task objectives.</li>
+      </ul>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════════════════════════ LEVEL 2 -->
+<div class="level-header l2">
+  <span class="level-badge">Level 2</span>
+  <h2>Intermediate Analytics</h2>
+</div>
+
+<!-- L2 T1 -->
+<div class="task-card">
+  <div class="task-header">
+    <div class="task-num l2-num">1</div>
+    <div>
+      <h3>Task 1 — Regression Analysis</h3>
+      <p>Dataset: Boston Housing (506 rows × 14 cols) &nbsp;·&nbsp; Tools: scikit-learn, pandas</p>
+    </div>
+  </div>
+  <div class="task-body">
+    <div class="metrics">
+      <div class="metric blue"><div class="label">R² Score</div><div class="value">0.669</div></div>
+      <div class="metric orange"><div class="label">RMSE ($000s)</div><div class="value">4.93</div></div>
+      <div class="metric green"><div class="label">MAE ($000s)</div><div class="value">3.19</div></div>
+      <div class="metric blue"><div class="label">Train / Test Split</div><div class="value">80/20</div></div>
+    </div>
+    <table class="results-table">
+      <thead><tr><th>Feature</th><th>Coefficient</th><th>Impact</th></tr></thead>
+      <tbody>
+        <tr><td>RM (Avg Rooms)</td><td class="best">+3.145</td><td><span class="tag green">Positive</span></td></tr>
+        <tr><td>RAD (Highway Access)</td><td>+2.251</td><td><span class="tag green">Positive</span></td></tr>
+        <tr><td>LSTAT (% Lower Status)</td><td>−3.612</td><td><span class="tag gray">Negative</span></td></tr>
+        <tr><td>DIS (Distance to Jobs)</td><td>−3.082</td><td><span class="tag gray">Negative</span></td></tr>
+        <tr><td>PTRATIO (Pupil:Teacher)</td><td>−2.038</td><td><span class="tag gray">Negative</span></td></tr>
+      </tbody>
+    </table>
+    <div class="plot-grid cols1">
+      <div class="plot-wrap"><img src="L2T1_regression.png" alt="Regression Analysis">
+        <div class="plot-caption">Fig 2.1 — Actual vs Predicted · Residual Distribution · Residuals vs Fitted · Feature Coefficients</div></div>
+    </div>
+    <div class="insights">
+      <h4>🔍 Key Insights</h4>
+      <ul>
+        <li><strong>R² = 0.669</strong> — the model explains ~67% of house price variance; decent for a linear model on this complex dataset.</li>
+        <li>Higher average rooms (RM) and lower % of low-status population (LSTAT) are the strongest predictors of higher prices.</li>
+        <li>Residuals are approximately normally distributed around zero — a good sign for linear regression assumptions.</li>
+        <li>Some heteroscedasticity is visible at high predicted values, suggesting non-linear relationships exist.</li>
+      </ul>
+    </div>
+  </div>
+</div>
+
+<!-- L2 T2 -->
+<div class="task-card">
+  <div class="task-header">
+    <div class="task-num l2-num">2</div>
+    <div>
+      <h3>Task 2 — Time Series Analysis</h3>
+      <p>Dataset: Stock Prices (505 symbols, 2014–2017) &nbsp;·&nbsp; Focus: AAPL &nbsp;·&nbsp; Tools: pandas, matplotlib</p>
+    </div>
+  </div>
+  <div class="task-body">
+    <div class="metrics">
+      <div class="metric blue"><div class="label">AAPL Records</div><div class="value">1,007</div></div>
+      <div class="metric green"><div class="label">Mean Close Price</div><div class="value">$116.84</div></div>
+      <div class="metric orange"><div class="label">Price Range</div><div class="value">$71 – $176</div></div>
+      <div class="metric blue"><div class="label">Date Range</div><div class="value">4 Years</div></div>
+    </div>
+    <div class="steps">
+      <div class="step"><div class="step-dot b">1</div><p>Parsed date column and filtered for <strong>AAPL</strong> (1,007 trading days from Jan 2014 – Dec 2017).</p></div>
+      <div class="step"><div class="step-dot b">2</div><p>Computed <strong>7-day, 30-day, and 90-day rolling moving averages</strong> to smooth short-term noise.</p></div>
+      <div class="step"><div class="step-dot b">3</div><p><strong>Manual decomposition</strong>: Trend (30-day centred MA), Seasonality (day-of-week pattern), and Irregular residual.</p></div>
+    </div>
+    <div class="plot-grid cols1">
+      <div class="plot-wrap"><img src="L2T2_timeseries.png" alt="Time Series">
+        <div class="plot-caption">Fig 2.2a — AAPL Close Price + Moving Averages · High-Low Range · Trading Volume</div></div>
+      <div class="plot-wrap"><img src="L2T2_decomposition.png" alt="Decomposition">
+        <div class="plot-caption">Fig 2.2b — Time Series Decomposition: Observed · Trend · Seasonal · Irregular</div></div>
+    </div>
+    <div class="insights">
+      <h4>🔍 Key Insights</h4>
+      <ul>
+        <li>AAPL showed an overall <strong>upward trend</strong> from ~$80 (2014) to a peak near $176 (late 2017).</li>
+        <li>A notable <strong>dip in 2016</strong> (~$90) corresponds to concerns about iPhone sales growth slowdown.</li>
+        <li>Trading volume spikes correlate with earnings announcements and major product reveals.</li>
+        <li>The 90-day MA smooths out all short-term volatility and clearly shows the multi-year bull trend.</li>
+      </ul>
+    </div>
+  </div>
+</div>
+
+<!-- L2 T3 -->
+<div class="task-card">
+  <div class="task-header">
+    <div class="task-num l2-num">3</div>
+    <div>
+      <h3>Task 3 — Clustering Analysis (K-Means)</h3>
+      <p>Dataset: Iris &nbsp;·&nbsp; Tools: scikit-learn, matplotlib, seaborn</p>
+    </div>
+  </div>
+  <div class="task-body">
+    <div class="metrics">
+      <div class="metric green"><div class="label">Optimal Clusters</div><div class="value">k = 3</div></div>
+      <div class="metric blue"><div class="label">Silhouette Score</div><div class="value">0.459</div></div>
+      <div class="metric orange"><div class="label">PCA Variance</div><div class="value">95.8%</div></div>
+      <div class="metric green"><div class="label">Inertia (k=3)</div><div class="value">140.97</div></div>
+    </div>
+    <div class="plot-grid cols1">
+      <div class="plot-wrap"><img src="L2T3_elbow.png" alt="Elbow + Silhouette">
+        <div class="plot-caption">Fig 2.3a — Elbow Method &amp; Silhouette Analysis: optimal k=3 confirmed</div></div>
+      <div class="plot-wrap"><img src="L2T3_clusters.png" alt="Cluster scatter">
+        <div class="plot-caption">Fig 2.3b — K-Means Clusters vs Ground Truth Species (PCA 2D projection, 95.8% variance retained)</div></div>
+    </div>
+    <div class="insights">
+      <h4>🔍 Key Insights</h4>
+      <ul>
+        <li>The elbow in the inertia curve and peak silhouette both confirm <strong>k = 3</strong> as optimal — matching the known 3 species.</li>
+        <li>PCA's first 2 components retain <strong>95.8% of total variance</strong>, enabling faithful 2D visualisation.</li>
+        <li>Cluster 1 (Setosa) is perfectly separated; Clusters 2 &amp; 3 (Versicolor/Virginica) have slight overlap — consistent with biological similarity.</li>
+        <li>Cluster sizes: 53, 50, 47 — closely balanced and matching ground-truth class sizes.</li>
+      </ul>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════════════════════════ LEVEL 3 -->
+<div class="level-header l3">
+  <span class="level-badge">Level 3</span>
+  <h2>Advanced Analytics</h2>
+</div>
+
+<!-- L3 T1 -->
+<div class="task-card">
+  <div class="task-header">
+    <div class="task-num l3-num">1</div>
+    <div>
+      <h3>Task 1 — Predictive Modeling (Classification)</h3>
+      <p>Dataset: Telecom Churn (2,666 train · 667 test) &nbsp;·&nbsp; Tools: scikit-learn, pandas</p>
+    </div>
+  </div>
+  <div class="task-body">
+    <div class="metrics">
+      <div class="metric green"><div class="label">Best Accuracy (RF)</div><div class="value">95.5%</div></div>
+      <div class="metric blue"><div class="label">Best AUC (RF)</div><div class="value">0.915</div></div>
+      <div class="metric orange"><div class="label">Best F1 (RF)</div><div class="value">0.821</div></div>
+      <div class="metric green"><div class="label">Churn Recall (Tuned)</div><div class="value">74%</div></div>
+    </div>
+    <table class="results-table">
+      <thead><tr><th>Model</th><th>Accuracy</th><th>Precision</th><th>Recall</th><th>F1</th><th>AUC</th></tr></thead>
+      <tbody>
+        <tr><td>Logistic Regression</td><td>85.5%</td><td>47.4%</td><td>19.0%</td><td>0.271</td><td>0.827</td></tr>
+        <tr><td>Decision Tree</td><td>91.3%</td><td>68.3%</td><td>72.6%</td><td>0.704</td><td>0.835</td></tr>
+        <tr><td><strong>Random Forest</strong></td><td class="best">95.5%</td><td class="best">94.5%</td><td>72.6%</td><td class="best">0.821</td><td class="best">0.915</td></tr>
+        <tr><td><strong>Tuned RF (GridSearch)</strong></td><td class="best">95.0%</td><td class="best">92%</td><td>74%</td><td class="best">0.820</td><td>—</td></tr>
+      </tbody>
+    </table>
+    <div class="plot-grid cols1">
+      <div class="plot-wrap"><img src="L3T1_classification.png" alt="Classification Results">
+        <div class="plot-caption">Fig 3.1 — Confusion Matrices (3 models) · ROC Curves · Metric Comparison · Feature Importances</div></div>
+    </div>
+    <div class="insights">
+      <h4>🔍 Key Insights</h4>
+      <ul>
+        <li><strong>Random Forest</strong> outperforms all models — AUC 0.915 and accuracy 95.5%, making it the production-ready choice.</li>
+        <li>Logistic Regression suffers on recall (19%) due to class imbalance (~85% non-churn), highlighting the need for ensemble methods.</li>
+        <li>GridSearch best params: <code>max_depth=None, min_samples_split=5, n_estimators=100</code>.</li>
+        <li>Top churn predictors: Total day charge, Customer service calls, International plan — actionable for business retention strategy.</li>
+        <li>High customer service call frequency is a strong churn signal — could trigger proactive outreach.</li>
+      </ul>
+    </div>
+  </div>
+</div>
+
+<!-- L3 T3 -->
+<div class="task-card">
+  <div class="task-header">
+    <div class="task-num l3-num">3</div>
+    <div>
+      <h3>Task 3 — NLP Sentiment Analysis</h3>
+      <p>Dataset: Social Media Posts (732 rows) &nbsp;·&nbsp; Tools: Python (regex, Counter), pandas, matplotlib</p>
+    </div>
+  </div>
+  <div class="task-body">
+    <div class="metrics">
+      <div class="metric green"><div class="label">Total Posts</div><div class="value">732</div></div>
+      <div class="metric blue"><div class="label">Sentiment Classes</div><div class="value">191</div></div>
+      <div class="metric orange"><div class="label">Platforms</div><div class="value">3</div></div>
+      <div class="metric green"><div class="label">Countries</div><div class="value">5+</div></div>
+    </div>
+    <div class="steps">
+      <div class="step"><div class="step-dot o">1</div><p><strong>Text preprocessing pipeline</strong>: URL removal → mention/hashtag stripping → punctuation removal → lowercasing → tokenisation → stopword filtering (custom 200-word list).</p></div>
+      <div class="step"><div class="step-dot o">2</div><p><strong>Sentiment classification</strong>: The dataset contains 191 fine-grained emotion labels (Joy, Excitement, Anger, Fear, etc.) — significantly richer than basic Positive/Negative/Neutral.</p></div>
+      <div class="step"><div class="step-dot o">3</div><p><strong>Word frequency analysis</strong> per sentiment class using Python's <code>Counter</code>. Built per-class vocabulary with top-N words extracted.</p></div>
+      <div class="step"><div class="step-dot o">4</div><p><strong>Temporal trend analysis</strong>: Monthly sentiment post counts aggregated to detect changes over time.</p></div>
+    </div>
+    <div class="plot-grid cols1">
+      <div class="plot-wrap"><img src="L3T3_sentiment.png" alt="Sentiment Overview">
+        <div class="plot-caption">Fig 3.3a — Sentiment Distribution · By Platform · By Country · Token Distribution · Top Words</div></div>
+      <div class="plot-wrap"><img src="L3T3_wordfreq.png" alt="Word Frequency">
+        <div class="plot-caption">Fig 3.3b — Top 20 Words per Sentiment Class (Positive / Negative / Neutral)</div></div>
+      <div class="plot-wrap"><img src="L3T3_trend.png" alt="Monthly Trend">
+        <div class="plot-caption">Fig 3.3c — Monthly Sentiment Volume Trend Over Time</div></div>
+    </div>
+    <div class="insights">
+      <h4>🔍 Key Insights</h4>
+      <ul>
+        <li>The dataset uses <strong>191 fine-grained emotion labels</strong> — far richer than standard sentiment, enabling nuanced analysis.</li>
+        <li>Positive sentiment posts use context words like <em>weekend, enjoying, exploring</em>; negative posts feature <em>terrible, traffic, political</em>.</li>
+        <li>Twitter dominates with the most posts across all sentiment classes; Instagram skews more positive.</li>
+        <li>USA and Canada contribute the highest volume of labelled posts in this dataset.</li>
+        <li>Text preprocessing successfully reduced noise: URLs, @mentions, #hashtags, punctuation, and stopwords all removed before analysis.</li>
+      </ul>
+    </div>
+  </div>
+</div>
+
+</div><!-- /container -->
+
+<div class="footer">
+  <p>Report compiled by <strong>Codveda Data Analytics Internship</strong> &nbsp;|&nbsp;
+  All 8 tasks completed across Level 1 · Level 2 · Level 3 &nbsp;|&nbsp;
+  Tools: Python · pandas · scikit-learn · matplotlib · seaborn</p>
+</div>
+
+</body>
+</html>
